@@ -1,4 +1,5 @@
 import { Discord, On, Client, ArgsOf } from "@typeit/discord";
+import { analyzeImage } from "./analyze";
 
 @Discord()
 export class Bot {
@@ -13,6 +14,8 @@ export class Bot {
 
   @On("message")
   public onMessage([message]: ArgsOf<"message">) {
+    if (!message.attachments) return;
+
     let caption = message.content;
     let authorId = message.author.id;
     let attachments = message.attachments.map((val) => val.url);
@@ -21,6 +24,7 @@ export class Bot {
 
     for (let attachment of attachments) {
       // analyze image
+      // save result
     }
   }
 }
