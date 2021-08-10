@@ -15,10 +15,6 @@ export class Bot {
 
   @On("message")
   public async onMessage([message]: ArgsOf<"message">) {
-    // FIXME
-    // if (!message.attachments) return;
-    // console.log(message);
-
     let caption: string = message.content;
     let authorId: string = message.author.id;
     let attachments: string[] = message.attachments.map((val) => val.url);
