@@ -25,8 +25,12 @@ export class Bot {
 
     for (let attachment of attachments) {
       // analyze image
-      // let res = analyzeImage(attachment);
-      // console.log(res);
+      console.log("analyzing image: " + attachment);
+      let res: { label: string; value: number }[] = await analyzeImage(
+        attachment
+      );
+      console.log(res);
+      console.log("done analizing");
       // save result
       await db.collection("images").add({
         authorId: authorId,

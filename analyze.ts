@@ -11,7 +11,9 @@ const clarifai = new V2Client(
 const metadata = new grpc.Metadata();
 metadata.set("authorization", `Key ${process.env.CLARIFAI_API_KEY}`);
 
-export function analyzeImage(url): { label: number; value: number }[] {
+export function analyzeImage(
+  url: string
+): Promise<{ label: string; value: number }[]> {
   const request = new service.PostModelOutputsRequest();
   // This is the model ID of a publicly available General model. You may use any other public or custom model ID.
   request.setModelId("aaa03c23b3724a16a56b629203edc62c");
@@ -21,18 +23,24 @@ export function analyzeImage(url): { label: number; value: number }[] {
     )
   );
 
-  clarifai.postModelOutputs(request, metadata, (error, response) => {
-    if (error) {
-      throw error;
-    }
+  return new Promise<{ label: string; value: number }[]>((resolve, reject) => {
+    clarifai.postModelOutputs(request, metadata, (error, response) => {
+      if (error) {
+        throw error;
+      }
 
-    if (response.getStatus().getCode() !== StatusCode.SUCCESS) {
-      throw "Clarifai Error: " + response.getStatus();
-    }
+      if (response.getStatus().getCode() !== StatusCode.SUCCESS) {
+        throw "Clarifai Error: " + response.getStatus();
+      }
 
-    return response.getOutputsList()[0].getData().getConceptsList();
+      let res: { label: string; value: number }[] = response
+        .getOutputsList()[0]
+        .getData()
+        .getConceptsList()
+        .map((r) => {
+          return { label: r.getName(), value: r.getValue() };
+        });
+      resolve(res);
+    });
   });
-
-  // FIXME always returns this one because the other one is a promise or so...
-  return null;
 }
