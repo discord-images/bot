@@ -15,6 +15,7 @@ export class Bot {
 
   @On("message")
   public async onMessage([message]: ArgsOf<"message">) {
+    // FIXME
     // if (!message.attachments) return;
     // console.log(message);
 
@@ -26,21 +27,18 @@ export class Bot {
     for (let attachment of attachments) {
       // analyze image
       console.log("analyzing image: " + attachment);
+      let labels = {};
       let res: { label: string; value: number }[] = await analyzeImage(
         attachment
       );
-      console.log(res);
-      console.log("done analizing");
+      res.forEach(({ label, value }) => (labels[label] = value));
       // save result
       await db.collection("images").add({
         authorId: authorId,
         caption: caption,
         time: time,
         url: attachment,
-        labels: {
-          nature: 0.4567,
-          tree: 0.86,
-        },
+        labels: labels,
       });
     }
   }
