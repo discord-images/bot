@@ -1,5 +1,6 @@
 import { Discord, On, Client, ArgsOf } from "@typeit/discord";
 import { analyzeImage } from "./analyze";
+import { db } from "./firebase";
 
 @Discord()
 export class Bot {
@@ -16,11 +17,12 @@ export class Bot {
   public onMessage([message]: ArgsOf<"message">) {
     if (!message.attachments) return;
 
-    let caption = message.content;
-    let authorId = message.author.id;
-    let attachments = message.attachments.map((val) => val.url);
+    console.log(message);
 
-    console.log(`${authorId} - ${caption} : ${[attachments]}`);
+    let caption: string = message.content;
+    let authorId: string = message.author.id;
+    let attachments: string[] = message.attachments.map((val) => val.url);
+    let time: Date = message.createdAt;
 
     for (let attachment of attachments) {
       // analyze image

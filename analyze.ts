@@ -11,7 +11,7 @@ const clarifai = new V2Client(
 const metadata = new grpc.Metadata();
 metadata.set("authorization", `Key ${process.env.CLARIFAI_API_KEY}`);
 
-export function analyzeImage(url): Array<resources.Concept> {
+export function analyzeImage(url): { label: number; value: number }[] {
   const request = new service.PostModelOutputsRequest();
   // This is the model ID of a publicly available General model. You may use any other public or custom model ID.
   request.setModelId("aaa03c23b3724a16a56b629203edc62c");
