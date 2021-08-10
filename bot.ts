@@ -14,10 +14,9 @@ export class Bot {
   }
 
   @On("message")
-  public onMessage([message]: ArgsOf<"message">) {
-    if (!message.attachments) return;
-
-    console.log(message);
+  public async onMessage([message]: ArgsOf<"message">) {
+    // if (!message.attachments) return;
+    // console.log(message);
 
     let caption: string = message.content;
     let authorId: string = message.author.id;
@@ -26,7 +25,19 @@ export class Bot {
 
     for (let attachment of attachments) {
       // analyze image
+      // let res = analyzeImage(attachment);
+      // console.log(res);
       // save result
+      await db.collection("images").add({
+        authorId: authorId,
+        caption: caption,
+        time: time,
+        url: attachment,
+        labels: {
+          nature: 0.4567,
+          tree: 0.86,
+        },
+      });
     }
   }
 }
