@@ -1,6 +1,7 @@
 import { Discord, On, Client, ArgsOf } from "@typeit/discord";
 import { analyzeImage } from "./analyze";
 import { db } from "./firebase";
+import { FieldValue } from "@google-cloud/firestore";
 
 @Discord()
 export class Bot {
@@ -23,10 +24,10 @@ export class Bot {
     for (let attachment of attachments) {
       // analyze image
       console.log("analyzing image: " + attachment);
-      let labels = {};
       let res: { label: string; value: number }[] = await analyzeImage(
         attachment
       );
+      let labels = {};
       res.forEach(({ label, value }) => (labels[label] = value));
       // save result
       await db.collection("images").add({
@@ -35,6 +36,13 @@ export class Bot {
         time: time,
         url: attachment,
         labels: labels,
+      });
+      // save stats
+      res.forEach(({ label }) => {
+        const ref = db.collection("stats").doc("labels");
+        let obj = {};
+        obj[label] = FieldValue.increment(1);
+        return ref.set(obj, { merge: true });
       });
     }
   }
