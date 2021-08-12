@@ -31,11 +31,11 @@ export class Bot {
       res.forEach(({ label, value }) => (labels[label] = value));
       // save result
       await db.collection("images").add({
-        authorId: authorId,
-        caption: caption,
-        time: time,
-        url: attachment,
-        labels: labels,
+        _authorId: authorId,
+        _caption: caption,
+        _time: time,
+        _url: attachment,
+        ...labels,
       });
       // save stats
       res.forEach(({ label }) => {
