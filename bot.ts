@@ -27,15 +27,16 @@ export class Bot {
       let res: { label: string; value: number }[] = await analyzeImage(
         attachment
       );
-      let labels = {};
-      res.forEach(({ label, value }) => (labels[label] = value));
+      let labels: string[] = res
+        .filter((r) => r.value > 0.9)
+        .map((r) => r.label);
       // save result
       await db.collection("images").add({
-        _authorId: authorId,
-        _caption: caption,
-        _time: time,
-        _url: attachment,
-        ...labels,
+        authorId: authorId,
+        caption: caption,
+        time: time,
+        url: attachment,
+        labels: labels,
       });
       // save stats
       res.forEach(({ label }) => {
