@@ -15,7 +15,6 @@ export function analyzeImage(
   url: string
 ): Promise<{ label: string; value: number }[]> {
   const request = new service.PostModelOutputsRequest();
-  // This is the model ID of a publicly available General model. You may use any other public or custom model ID.
   request.setModelId("aaa03c23b3724a16a56b629203edc62c");
   request.addInputs(
     new resources.Input().setData(
@@ -26,11 +25,11 @@ export function analyzeImage(
   return new Promise<{ label: string; value: number }[]>((resolve, reject) => {
     clarifai.postModelOutputs(request, metadata, (error, response) => {
       if (error) {
-        throw error;
+        reject(error.message);
       }
 
       if (response.getStatus().getCode() !== StatusCode.SUCCESS) {
-        throw "Clarifai Error: " + response.getStatus();
+        reject();
       }
 
       let res: { label: string; value: number }[] = response
@@ -41,6 +40,39 @@ export function analyzeImage(
           return { label: r.getName(), value: r.getValue() };
         });
       resolve(res);
+    });
+  });
+}
+
+export function analyzeText(url: string): Promise<string> {
+  // FIXME 2 possible models:
+  // https://www.clarifai.com/models/ocr-scene
+  // https://www.clarifai.com/models/optical-character-recognition-analysis
+
+  const request = new service.PostModelOutputsRequest();
+  request.setModelId("f1b1005c8feaa8d3f34d35f224092915");
+  request.addInputs(
+    new resources.Input().setData(
+      new resources.Data().setImage(new resources.Image().setUrl(url))
+    )
+  );
+
+  return new Promise<string>((resolve, reject) => {
+    clarifai.postModelOutputs(request, metadata, (error, response) => {
+      if (error) {
+        reject(error.message);
+      }
+
+      if (response.getStatus().getCode() !== StatusCode.SUCCESS) {
+        reject();
+      }
+
+      let res = response
+        .getOutputsList()[0]
+        .getData()
+        .getRegionsList()
+        .map((x) => x.getData().getText().getRaw().toString());
+      resolve(res.join(" "));
     });
   });
 }
